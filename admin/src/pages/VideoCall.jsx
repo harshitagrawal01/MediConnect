@@ -53,7 +53,10 @@ const VideoCall = () => {
 
       await client.join(appId, channelName, agoraToken, uid)
 
-      const [audioTrack, videoTrack] = await AgoraRTC.createMicrophoneAndCameraTracks()
+      const [audioTrack, videoTrack] = await AgoraRTC.createMicrophoneAndCameraTracks(
+        {},
+        { facingMode: "user"}
+      )
       localTracksRef.current = { audioTrack, videoTrack }
 
       await client.publish([audioTrack, videoTrack])

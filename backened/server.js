@@ -26,9 +26,14 @@ const server = http.createServer(app);
 
 const onlineUsers = {};
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.ADMIN_URL,
+];
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL,
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
   },
 });
@@ -110,9 +115,11 @@ io.on("connection", (socket) => {
 });
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
-}))
+}));
+
 app.use(express.json())
 
 app.use('/api/admin', adminRouter)

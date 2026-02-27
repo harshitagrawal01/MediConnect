@@ -95,7 +95,6 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("DISCONNECTED:", socket.id);
 
-    // ✅ BUG 2 FIX: was using .forEach on an object — objects need for...in
     for (const room in onlineUsers) {
       for (const role in onlineUsers[room]) {
         if (onlineUsers[room][role] === socket.id) {
@@ -110,7 +109,10 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use(cors())
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true
+}))
 app.use(express.json())
 
 app.use('/api/admin', adminRouter)

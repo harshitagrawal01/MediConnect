@@ -20,16 +20,16 @@ const Header = () => {
       </div>
 
       {/* ------Right Side------*/}
-      <div className='md:w-1/2 relative flex items-end justify-center overflow-hidden'>
+      <div className='md:w-1/2 relative flex items-end justify-center md:overflow-hidden mt-6 md:mt-0'>
 
-        {/* Glow effect behind doctors */}
-        <div className='absolute bottom-0 w-[80%] h-[80%] bg-white opacity-5 rounded-full blur-3xl'></div>
+        {/* Glow effect behind doctors — hidden on mobile to avoid overflow */}
+        <div className='hidden md:block absolute bottom-0 w-[80%] h-[80%] bg-white opacity-5 rounded-full blur-3xl'></div>
 
-        {/* Subtle ground shadow */}
-        <div className='absolute bottom-0 left-1/2 -translate-x-1/2 w-[70%] h-6 bg-black opacity-20 blur-xl rounded-full'></div>
+        {/* Subtle ground shadow — hidden on mobile */}
+        <div className='hidden md:block absolute bottom-0 left-1/2 -translate-x-1/2 w-[70%] h-6 bg-black opacity-20 blur-xl rounded-full'></div>
 
         <img
-          className='w-full md:absolute md:bottom-0 md:right-0 object-contain object-bottom scale-125 origin-bottom'
+          className='w-[85%] mx-auto md:w-full md:absolute md:bottom-0 md:right-0 object-contain object-bottom md:scale-125 md:origin-bottom'
           style={{
             filter: 'drop-shadow(0px 20px 40px rgba(0,0,0,0.3)) contrast(1.05) brightness(1.02)',
             WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 18%, black 88%, transparent 100%)',
@@ -45,5 +45,6 @@ const Header = () => {
 }
 
 export default Header
+
 
 

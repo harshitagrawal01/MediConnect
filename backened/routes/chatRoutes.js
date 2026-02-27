@@ -69,7 +69,7 @@ router.post("/upload", upload.single("file"), async (req, res) => {
 
     res.json({
       success: true,
-      fileUrl: result.secure_url,   // ✅ full Cloudinary URL, not a local path
+      fileUrl: result.secure_url,   
       fileName: req.file.originalname,
       messageType: "file",
     });

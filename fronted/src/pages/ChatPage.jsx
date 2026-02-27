@@ -170,7 +170,7 @@ const TypingDot = ({ delay }) => (
   }} />
 );
 
-// ✅ Renders file messages — PDF as card, image as preview
+//  Renders file messages — PDF as card, image as preview
 const FileBubble = ({ m, isMe }) => {
   const isPdf = m.fileUrl && (m.fileUrl.includes(".pdf") || m.fileUrl.includes("/raw/"));
   if (isPdf) {
@@ -195,7 +195,7 @@ const FileBubble = ({ m, isMe }) => {
   return (
     <a href={m.fileUrl} target="_blank" rel="noreferrer" style={{ display: "inline-block" }}>
       <img
-        src={m.fileUrl}   // ✅ Cloudinary URL is absolute — no prefix needed
+        src={m.fileUrl}   //  Cloudinary URL is absolute — no prefix needed
         alt={m.fileName || "image"}
         style={{ maxWidth: "220px", borderRadius: "14px", display: "block", cursor: "pointer" }}
       />
@@ -218,7 +218,7 @@ const ChatPage = () => {
 
   // Join room & receive messages
   useEffect(() => {
-    // ✅ Wait for connection then join with role info
+    //  Wait for connection then join with role info
     const emitJoin = () => {
       socket.emit("join_room", { room: appointmentId, role: "patient" });
     };
@@ -247,7 +247,7 @@ const ChatPage = () => {
     };
     socket.on("receive_message", handleReceive);
 
-    // ✅ Listen for typing events from the other person
+    //  Listen for typing events from the other person
     const handleTyping = ({ senderRole }) => {
       if (senderRole !== myRole) setIsTyping(true);
     };
@@ -294,7 +294,7 @@ const ChatPage = () => {
   }, [appointmentId]);
 
 
-  // ✅ Listen for seen event — update MY sent messages
+  //  Listen for seen event — update MY sent messages
   useEffect(() => {
     const handleSeen = ({ seenBy }) => {
       if (seenBy === myRole) return;
@@ -334,7 +334,7 @@ const ChatPage = () => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   };
 
-  // ✅ Upload to Cloudinary via /api/chat/upload, then emit via socket
+  //  Upload to Cloudinary via /api/chat/upload, then emit via socket
   const uploadFile = async (file) => {
     setUploading(true);
     try {
@@ -351,7 +351,7 @@ const ChatPage = () => {
           senderRole: myRole,
           message: "",
           messageType: "file",
-          fileUrl: data.fileUrl,   // ✅ Cloudinary absolute URL
+          fileUrl: data.fileUrl,   
           fileName: data.fileName,
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         });
@@ -461,7 +461,7 @@ const ChatPage = () => {
                 onChange={handleFileSelect}
               />
               <div style={S.inputPill}>
-                {/* ✅ Styled attach button inside pill */}
+                {/* Styled attach button inside pill */}
                 <button
                   className="attach-btn"
                   style={S.attachBtn}

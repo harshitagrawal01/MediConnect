@@ -115,7 +115,7 @@ const Doctors = () => {
                       <p className="text-lg font-bold text-gray-800 line-clamp-1">{item.name}</p>
                       <p className="text-sm text-teal-700 mb-2 font-medium">{item.speciality}</p>
 
-                      {/* ✅ Star Rating */}
+                      {/*  Star Rating */}
                       <div className='mb-3'>
                         {item.averageRating > 0 ? (
                           <StarDisplay rating={item.averageRating} totalReviews={item.totalReviews} />

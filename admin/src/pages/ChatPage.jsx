@@ -199,7 +199,7 @@ const ChatPage = () => {
   const myRole = "doctor";
 
   useEffect(() => {
-    // ✅ Wait for connection then join with role info
+    //  Wait for connection then join with role info
     const emitJoin = () => {
       socket.emit("join_room", { room: appointmentId, role: "doctor" });
     };
@@ -228,7 +228,7 @@ const ChatPage = () => {
     };
     socket.on("receive_message", handleReceive);
 
-    // ✅ Listen for typing events from the other person
+    //  Listen for typing events from the other person
     const handleTyping = ({ senderRole }) => {
       if (senderRole !== myRole) setIsTyping(true);
     };
@@ -273,7 +273,7 @@ const ChatPage = () => {
   }, [appointmentId]);
 
 
-  // ✅ Listen for seen — update MY sent messages
+  //  Listen for seen — update MY sent messages
   useEffect(() => {
     const handleSeen = ({ seenBy }) => {
       if (seenBy === myRole) return;
@@ -296,7 +296,6 @@ const ChatPage = () => {
 
   const sendMessage = () => {
     if (!currentMessage.trim()) return;
-    // Stop typing indicator when message sent
     clearTimeout(typingTimeoutRef.current);
     socket.emit("stop_typing", { room: appointmentId, senderRole: myRole });
     socket.emit("send_message", {
@@ -384,7 +383,7 @@ const ChatPage = () => {
                   <div key={m._id || i} style={S.msgRow(isMe)}>
                     <div style={S.msgInit(isMe)}>{isMe ? "Dr" : "P"}</div>
                     <div style={S.bubbleWrap(isMe)}>
-                      {/* ✅ File or text */}
+                      {/*  File or text */}
                       {m.messageType === "file" && m.fileUrl
                         ? <FileBubble m={m} isMe={isMe} />
                         : <div style={S.bubble(isMe)}>{m.message}</div>
@@ -431,7 +430,7 @@ const ChatPage = () => {
                 onChange={handleFileSelect}
               />
               <div style={S.inputPill}>
-                {/* ✅ Attach button — was missing in doctor's original file */}
+                {/* Attach button — was missing in doctor's original file */}
                 <button
                   className="dchat-attach"
                   style={S.attachBtn}

@@ -160,7 +160,7 @@ const VideoCall = () => {
         /* ── WAITING ROOM ── */
         <div style={{ textAlign: 'center', zIndex: 1, maxWidth: '420px', width: '100%' }}>
 
-          {/* Logo / Icon */}
+          {/* Logo */}
           <div style={{
             width: '90px', height: '90px',
             background: 'linear-gradient(135deg, #14b8a6, #0ea5e9)',

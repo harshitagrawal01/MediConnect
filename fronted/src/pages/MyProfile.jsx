@@ -298,7 +298,7 @@ const MyProfile = () => {
           </div>
         </div>
 
-        {/* Additional Quick Actions (Optional) */}
+        {/* Additional Quick Actions */}
         <div className='grid md:grid-cols-3 gap-4'>
           
           <div className='bg-white rounded-xl p-6 shadow-md border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer'>

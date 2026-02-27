@@ -14,7 +14,7 @@ import videoRoutes from "./routes/videoRoutes.js"
 import contactRouter from './routes/contactRoutes.js'
 import reviewRouter from './routes/reviewRoutes.js'
 
-// server.js
+
 if (process.env.NODE_ENV === "production") {
   console.log = () => {};
   console.warn = () => {};

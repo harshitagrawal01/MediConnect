@@ -22,7 +22,7 @@ const DoctorsList = () => {
             className='bg-white border border-gray-200 rounded-xl w-56 overflow-hidden cursor-pointer group flex flex-col hover:-translate-y-2 hover:shadow-xl hover:border-teal-400 transition-all duration-300'
             key={index}
           >
-            {/* Image area — gray-100 background is neutral, won't clash with any photo */}
+            {/* Image area  */}
             <div className='w-full h-52 bg-white overflow-hidden flex-shrink-0'>
               <img
                 className='w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500'

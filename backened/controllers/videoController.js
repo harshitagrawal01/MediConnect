@@ -4,7 +4,6 @@ import appointmentModel from '../models/appointmentModel.js'
 
 const generateToken = async (req, res) => {
   try {
-    // your code here
     const { appointmentId, uid } = req.body;
     const appointment = await appointmentModel.findById(appointmentId);
     if (!appointment) return res.json({ success: false, message: 'Appointment not found' })

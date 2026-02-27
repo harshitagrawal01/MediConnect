@@ -22,9 +22,14 @@ const VideoCall = () => {
 
   const joinCall = async () => {
     try {
+      if (clientRef.current) {
+        await clientRef.current.leave()
+        clientRef.current = null
+      }
+
       const appId = import.meta.env.VITE_AGORA_APP_ID
       const channelName = appointmentId
-      const uid = 0 
+      const uid = 0
 
       const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' })
       clientRef.current = client
@@ -33,7 +38,9 @@ const VideoCall = () => {
         await client.subscribe(user, mediaType)
         if (mediaType === 'video') {
           setRemoteUser(user)
-          user.videoTrack.play('remote-video')
+          setTimeout(() => {
+            user.videoTrack.play('remote-video')
+          }, 500)
         }
         if (mediaType === 'audio') {
           user.audioTrack.play()
@@ -50,7 +57,11 @@ const VideoCall = () => {
       localTracksRef.current = { audioTrack, videoTrack }
 
       await client.publish([audioTrack, videoTrack])
-      videoTrack.play('local-video')
+
+      setTimeout(() => {
+        videoTrack.play('local-video')
+      }, 500)
+
       setIsJoined(true)
 
       // Start call timer
@@ -84,7 +95,11 @@ const VideoCall = () => {
     const { audioTrack, videoTrack } = localTracksRef.current
     if (audioTrack) audioTrack.close()
     if (videoTrack) videoTrack.close()
-    if (clientRef.current) await clientRef.current.leave()
+    if (clientRef.current) {
+      await clientRef.current.leave()
+      clientRef.current = null 
+    }
+    localTracksRef.current = { audioTrack: null, videoTrack: null } 
     if (timerRef.current) clearInterval(timerRef.current)
     setIsJoined(false)
     navigate('/my-appointments')
@@ -417,4 +432,5 @@ const VideoCall = () => {
 }
 
 export default VideoCall
+
 

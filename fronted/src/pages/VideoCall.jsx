@@ -21,7 +21,7 @@ const VideoCall = () => {
   const localTracksRef = useRef({ audioTrack: null, videoTrack: null })
   const timerRef = useRef(null)
 
-  // ✅ FIX: Store pending remote video track so we can play it after DOM renders
+  
   const pendingRemoteVideoTrack = useRef(null)
 
   const joinCall = async () => {
@@ -39,11 +39,11 @@ const VideoCall = () => {
       clientRef.current = client
 
       client.on('user-published', async (user, mediaType) => {
-        // ✅ Subscribe immediately — don't delay this
+       
         await client.subscribe(user, mediaType)
 
         if (mediaType === 'video') {
-          // ✅ Store the track ref FIRST, then trigger state update
+          
           pendingRemoteVideoTrack.current = user.videoTrack
           setRemoteUser(user) // This triggers re-render → useEffect will play the track
         }
@@ -69,7 +69,7 @@ const VideoCall = () => {
       localTracksRef.current = { audioTrack, videoTrack }
       await client.publish([audioTrack, videoTrack])
 
-      // ✅ Set joined first so the local-video div renders, then play
+      
       setIsJoined(true)
 
       timerRef.current = setInterval(() => {
@@ -82,7 +82,7 @@ const VideoCall = () => {
     }
   }
 
-  // ✅ FIX: Play local video AFTER isJoined renders the local-video div
+ 
   useEffect(() => {
     if (isJoined && localTracksRef.current.videoTrack) {
       const raf = requestAnimationFrame(() => {
@@ -92,7 +92,7 @@ const VideoCall = () => {
     }
   }, [isJoined])
 
-  // ✅ FIX: Play remote video AFTER remoteUser state change causes DOM to render the div
+  
   useEffect(() => {
     if (remoteUser && pendingRemoteVideoTrack.current) {
       const raf = requestAnimationFrame(() => {

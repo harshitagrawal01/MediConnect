@@ -13,6 +13,7 @@ import chatRoutes from "./routes/chatRoutes.js";
 import videoRoutes from "./routes/videoRoutes.js"
 import contactRouter from './routes/contactRoutes.js'
 import reviewRouter from './routes/reviewRoutes.js'
+import https from 'https'
 
 
 if (process.env.NODE_ENV === "production") {
@@ -131,6 +132,17 @@ app.use('/api/contact',contactRouter)
 app.use('/api/review', reviewRouter)
 
 app.get('/', (req, res) => res.send('API working'))
+
+// Keep server awake on free tier
+setInterval(() => {
+  https.get('https://mediconnect-mvp5.onrender.com/', (res) => {
+    console.log('Server pinged, status:', res.statusCode);
+  }).on('error', (err) => {
+    console.error('Ping error:', err.message);
+  });
+}, 14 * 60 * 1000);
+
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 

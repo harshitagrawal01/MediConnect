@@ -13,7 +13,7 @@ const TopDoctors = () => {
       <h1 className='text-3xl font-medium'>Top Doctors to Book</h1>
       <p className='sm:w-1/3 text-center text-sm'>Simply browse through our extensive list of trusted doctors.</p>
 
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full items-stretch'>
+      <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 w-full items-stretch'>
         {doctors?.slice(0, 4).map((item, index) => (
           <div
             key={item._id}
@@ -23,7 +23,7 @@ const TopDoctors = () => {
             {/* Image Container */}
             <div className='relative bg-gradient-to-b from-teal-50 to-white flex-shrink-0'>
               <img
-                className='w-full h-56 object-cover object-top group-hover:scale-105 transition-transform duration-300'
+                className='w-full h-48 object-cover object-center group-hover:scale-105 transition-transform duration-300'
                 src={item.image}
                 alt={item.name}
               />
@@ -46,7 +46,7 @@ const TopDoctors = () => {
             </div>
 
             {/* Card Content */}
-            <div className='p-5 flex flex-col flex-grow'>
+            <div className='p-3 sm:p-5 flex flex-col flex-grow'>
               <p className='text-gray-900 text-lg font-bold mb-1'>{item.name}</p>
               <p className='text-teal-600 text-sm font-medium mb-2'>{item.speciality}</p>
 

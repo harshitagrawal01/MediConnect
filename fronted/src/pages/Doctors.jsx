@@ -83,7 +83,7 @@ const Doctors = () => {
           {/* Doctors Grid */}
           <div className="flex-1">
             {filterDoc.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-stretch">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 items-stretch">
                 {filterDoc.map((item) => (
                   <div
                     key={item._id}
@@ -93,7 +93,7 @@ const Doctors = () => {
                     {/* Image area */}
                     <div className="relative bg-gradient-to-b from-teal-50 to-white overflow-hidden flex-shrink-0">
                       <img
-                        className="w-full h-52 object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-48 object-cover object-center group-hover:scale-105 transition-transform duration-300"
                         src={item.image}
                         alt={item.name}
                       />
@@ -111,7 +111,7 @@ const Doctors = () => {
                     </div>
 
                     {/* Card content */}
-                    <div className="p-5 flex flex-col flex-grow">
+                    <div className="p-3 sm:p-5 flex flex-col flex-grow">
                       <p className="text-lg font-bold text-gray-800 line-clamp-1">{item.name}</p>
                       <p className="text-sm text-teal-700 mb-2 font-medium">{item.speciality}</p>
 

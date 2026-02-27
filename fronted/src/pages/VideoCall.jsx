@@ -69,7 +69,7 @@ const VideoCall = () => {
       localTracksRef.current = { audioTrack, videoTrack }
       await client.publish([audioTrack, videoTrack])
 
-      videoTrack.play('local-video')
+      // ✅ Set joined first so the local-video div renders, then play
       setIsJoined(true)
 
       timerRef.current = setInterval(() => {
@@ -82,13 +82,21 @@ const VideoCall = () => {
     }
   }
 
+  // ✅ FIX: Play local video AFTER isJoined renders the local-video div
+  useEffect(() => {
+    if (isJoined && localTracksRef.current.videoTrack) {
+      const raf = requestAnimationFrame(() => {
+        localTracksRef.current.videoTrack?.play('local-video')
+      })
+      return () => cancelAnimationFrame(raf)
+    }
+  }, [isJoined])
+
   // ✅ FIX: Play remote video AFTER remoteUser state change causes DOM to render the div
   useEffect(() => {
     if (remoteUser && pendingRemoteVideoTrack.current) {
-      // Small tick to ensure React has committed the DOM update
       const raf = requestAnimationFrame(() => {
-        const el = document.getElementById('remote-video')
-        if (el && pendingRemoteVideoTrack.current) {
+        if (pendingRemoteVideoTrack.current) {
           pendingRemoteVideoTrack.current.play('remote-video')
         }
       })
@@ -444,5 +452,6 @@ const VideoCall = () => {
 }
 
 export default VideoCall
+
 
 

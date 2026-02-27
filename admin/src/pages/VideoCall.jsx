@@ -16,9 +16,13 @@ const VideoCall = () => {
   const [isCameraOff, setIsCameraOff] = useState(false)
   const [isJoined, setIsJoined] = useState(false)
   const [callDuration, setCallDuration] = useState(0)
+
   const clientRef = useRef(null)
   const localTracksRef = useRef({ audioTrack: null, videoTrack: null })
   const timerRef = useRef(null)
+
+  // ✅ FIX: Store pending remote video track so we can play it after DOM renders
+  const pendingRemoteVideoTrack = useRef(null)
 
   const joinCall = async () => {
     try {
@@ -29,46 +33,45 @@ const VideoCall = () => {
 
       const appId = import.meta.env.VITE_AGORA_APP_ID
       const channelName = appointmentId
-      const uid = 1
+      const uid = 1  // Doctor is always uid: 1
 
       const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' })
       clientRef.current = client
 
       client.on('user-published', async (user, mediaType) => {
+        // ✅ Subscribe immediately — don't delay this
         await client.subscribe(user, mediaType)
+
         if (mediaType === 'video') {
-          setRemoteUser(user)
-          setTimeout(() => {
-            user.videoTrack.play('remote-video')
-          }, 500)
+          // ✅ Store the track ref FIRST, then trigger state update
+          pendingRemoteVideoTrack.current = user.videoTrack
+          setRemoteUser(user) // triggers re-render → useEffect plays the track
         }
+
         if (mediaType === 'audio') {
           user.audioTrack.play()
         }
       })
 
-      client.on('user-unpublished', () => {
-        setRemoteUser(null)
+      client.on('user-unpublished', (user, mediaType) => {
+        if (mediaType === 'video') {
+          pendingRemoteVideoTrack.current = null
+          setRemoteUser(null)
+        }
       })
 
       await client.join(appId, channelName, agoraToken, uid)
 
       const [audioTrack, videoTrack] = await AgoraRTC.createMicrophoneAndCameraTracks(
         {},
-        { facingMode: "user"}
+        { facingMode: 'user' }
       )
       localTracksRef.current = { audioTrack, videoTrack }
-
       await client.publish([audioTrack, videoTrack])
 
-      
-      setTimeout(() => {
-        videoTrack.play('local-video')
-      }, 500)
-
+      // ✅ Set joined FIRST so local-video div renders, then useEffect plays it
       setIsJoined(true)
 
-      // Start call timer
       timerRef.current = setInterval(() => {
         setCallDuration(prev => prev + 1)
       }, 1000)
@@ -78,6 +81,28 @@ const VideoCall = () => {
       toast.error('Failed to join call. Please try again.')
     }
   }
+
+  // ✅ FIX: Play local video AFTER isJoined renders the local-video div
+  useEffect(() => {
+    if (isJoined && localTracksRef.current.videoTrack) {
+      const raf = requestAnimationFrame(() => {
+        localTracksRef.current.videoTrack?.play('local-video')
+      })
+      return () => cancelAnimationFrame(raf)
+    }
+  }, [isJoined])
+
+  // ✅ FIX: Play remote video AFTER remoteUser state change causes DOM to render the div
+  useEffect(() => {
+    if (remoteUser && pendingRemoteVideoTrack.current) {
+      const raf = requestAnimationFrame(() => {
+        if (pendingRemoteVideoTrack.current) {
+          pendingRemoteVideoTrack.current.play('remote-video')
+        }
+      })
+      return () => cancelAnimationFrame(raf)
+    }
+  }, [remoteUser])
 
   const toggleMute = async () => {
     const audioTrack = localTracksRef.current.audioTrack
@@ -101,9 +126,10 @@ const VideoCall = () => {
     if (videoTrack) videoTrack.close()
     if (clientRef.current) {
       await clientRef.current.leave()
-      clientRef.current = null // 
+      clientRef.current = null
     }
-    localTracksRef.current = { audioTrack: null, videoTrack: null } 
+    localTracksRef.current = { audioTrack: null, videoTrack: null }
+    pendingRemoteVideoTrack.current = null
     if (timerRef.current) clearInterval(timerRef.current)
     setIsJoined(false)
     navigate('/doctor-appointments')
@@ -179,7 +205,6 @@ const VideoCall = () => {
         /* ── WAITING ROOM ── */
         <div style={{ textAlign: 'center', zIndex: 1, maxWidth: '420px', width: '100%' }}>
 
-          {/* Logo / Icon */}
           <div style={{
             width: '90px', height: '90px',
             background: 'linear-gradient(135deg, #14b8a6, #0ea5e9)',
@@ -198,10 +223,9 @@ const VideoCall = () => {
             MediConnect
           </h1>
           <p style={{ color: '#64748b', fontSize: '15px', marginBottom: '36px', lineHeight: '1.6' }}>
-            Your doctor is ready. Join the consultation when you're set.
+            Your patient is waiting. Start the consultation when ready.
           </p>
 
-          {/* Info card */}
           <div style={{
             background: 'rgba(255,255,255,0.04)',
             border: '1px solid rgba(255,255,255,0.08)',
@@ -226,9 +250,7 @@ const VideoCall = () => {
             style={{
               width: '100%',
               padding: '16px',
-              background: agoraToken
-                ? 'linear-gradient(135deg, #14b8a6, #0ea5e9)'
-                : 'rgba(255,255,255,0.06)',
+              background: agoraToken ? 'linear-gradient(135deg, #14b8a6, #0ea5e9)' : 'rgba(255,255,255,0.06)',
               border: 'none',
               borderRadius: '14px',
               color: agoraToken ? 'white' : '#475569',
@@ -249,7 +271,7 @@ const VideoCall = () => {
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
                 </svg>
-                Join Consultation
+                Start Consultation
               </>
             ) : (
               <>
@@ -308,11 +330,14 @@ const VideoCall = () => {
             height: '65vh',
             marginBottom: '20px'
           }}>
+            {/* Remote video — always in DOM so element is always available */}
+            <div
+              id='remote-video'
+              style={{ width: '100%', height: '100%', display: remoteUser ? 'block' : 'none' }}
+            />
 
-            {/* Remote video */}
-            {remoteUser ? (
-              <div id='remote-video' style={{ width: '100%', height: '100%' }} />
-            ) : (
+            {/* Waiting state */}
+            {!remoteUser && (
               <div style={{
                 width: '100%', height: '100%',
                 display: 'flex', flexDirection: 'column',
@@ -330,7 +355,7 @@ const VideoCall = () => {
                 </div>
                 <p style={{ color: '#475569', fontSize: '15px' }}>Waiting for patient to join...</p>
                 <div style={{ display: 'flex', gap: '6px' }}>
-                  {[0,1,2].map(i => (
+                  {[0, 1, 2].map(i => (
                     <div key={i} style={{
                       width: '8px', height: '8px',
                       background: '#14b8a6', borderRadius: '50%',
@@ -368,7 +393,6 @@ const VideoCall = () => {
                 color: 'rgba(255,255,255,0.7)', fontSize: '11px', fontWeight: '500'
               }}>You</div>
             </div>
-
           </div>
 
           {/* Controls */}
@@ -421,7 +445,6 @@ const VideoCall = () => {
                 {isCameraOff && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" />}
               </svg>
             </button>
-
           </div>
 
           <style>{`

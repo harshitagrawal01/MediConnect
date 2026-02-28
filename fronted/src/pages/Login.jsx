@@ -30,7 +30,7 @@ const Login = () => {
           setToken(data.token)
         }
         else{
-          toast.error(error.message)
+          toast.error(data.message)
         }
       }
       else{
@@ -40,7 +40,7 @@ const Login = () => {
           setToken(data.token)
         }
         else{
-          toast.error(error.message)
+          toast.error(data.message)
         }
       }
 

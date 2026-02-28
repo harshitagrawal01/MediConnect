@@ -66,6 +66,9 @@ const Login = () => {
     } else if (message === 'already-verified') {
       toast.info('Email already verified. Please login.')
       setState('Login')
+    } else if (message === 'password-reset') {
+      toast.success('Password reset successful! Please login.')
+      setState('Login')
     }
   }, [])
   return (

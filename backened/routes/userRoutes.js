@@ -19,7 +19,7 @@ userRouter.post('/verifyRazorpay',authUser,verifyRazorpay)
 
 userRouter.get('/verify-email/:token', verifyEmail)
 
-router.get('/test-email', async (req, res) => {
+userRouter.get('/test-email', async (req, res) => {
   try {
     await sendVerificationEmail({ 
       _id: '123', 

@@ -2,6 +2,7 @@ import express from  'express'
 import { bookAppointment, cancelAppointment, getProfile, listAppointment, loginUser, paymentRazorpay, registerUser, updateProfile, verifyEmail, verifyRazorpay } from '../controllers/userController.js'
 import authUser from '../middlewares/authUser.js'
 import upload from '../middlewares/multer.js'
+import sendVerificationEmail from '../utils/sendVerificationEmail.js'
 
 const userRouter = express.Router()
 
@@ -17,5 +18,19 @@ userRouter.post('/payment-razorpay',authUser,paymentRazorpay)
 userRouter.post('/verifyRazorpay',authUser,verifyRazorpay)
 
 userRouter.get('/verify-email/:token', verifyEmail)
+
+router.get('/test-email', async (req, res) => {
+  try {
+    await sendVerificationEmail({ 
+      _id: '123', 
+      name: 'Test', 
+      email: 'your_real_email@gmail.com'  // replace with your actual email
+    })
+    res.json({ success: true, message: 'Email sent!' })
+  } catch (error) {
+    res.json({ success: false, message: error.message })
+  }
+})
+
 
 export default userRouter

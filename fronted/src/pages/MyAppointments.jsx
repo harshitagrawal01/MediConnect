@@ -218,45 +218,45 @@ const MyAppointments = () => {
                   )}
                 </div>
 
-                <div className='flex lg:flex-col gap-3 justify-center items-center lg:items-stretch'>
+                <div className='flex flex-row overflow-x-auto lg:flex-col gap-3 justify-start lg:justify-center items-center lg:items-stretch pb-1 lg:pb-0'>
                   {!item.cancelled && item.payment && !item.isCompleted && (
-                    <button className='sm:min-w-48 py-2 border rounded text-stone-500 bg-teal-50'>Paid</button>
+                    <button className='sm:min-w-48 py-2 border flex-shrink-0 rounded text-stone-500 bg-teal-50'>Paid</button>
                   )}
                   {!item.cancelled && item.payment && isFutureAppointment(item.slotDate) && (
-                    <button onClick={() => navigate(`/chat/${item._id}`)} className='flex-1 lg:flex-initial bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 min-w-[160px]'>
+                    <button onClick={() => navigate(`/chat/${item._id}`)} className='flex-1 lg:flex-initial flex-shrink-0 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 min-w-[160px]'>
                       <svg className='w-5 h-5' fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
                       Chat with Doctor
                     </button>
                   )}
                   {!item.cancelled && item.payment && !item.isCompleted && isFutureAppointment(item.slotDate) && (
-                    <button onClick={() => navigate(`/video/${item._id}`)} className='flex-1 lg:flex-initial bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 min-w-[160px]'>
+                    <button onClick={() => navigate(`/video/${item._id}`)} className='flex-1 lg:flex-initial flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 min-w-[160px]'>
                       <svg className='w-5 h-5' fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" /></svg>
                       Video Consultation
                     </button>
                   )}
                   {!item.cancelled && !item.payment && !item.isCompleted && (
-                    <button onClick={() => appointmentRazorpay(item._id)} className='flex-1 lg:flex-initial bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 min-w-[160px]'>
+                    <button onClick={() => appointmentRazorpay(item._id)} className='flex-1 lg:flex-initial flex-shrink-0 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 min-w-[160px]'>
                       <svg className='w-5 h-5' fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                       Pay Online
                     </button>
                   )}
                   {!item.cancelled && !item.isCompleted && isFutureAppointment(item.slotDate) && (
-                    <button onClick={() => cancelAppointment(item._id)} className='flex-1 lg:flex-initial border-2 border-red-500 text-red-600 hover:bg-red-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 min-w-[160px]'>
+                    <button onClick={() => cancelAppointment(item._id)} className='flex-1 lg:flex-initial flex-shrink-0 border-2 border-red-500 text-red-600 hover:bg-red-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 min-w-[160px]'>
                       <svg className='w-5 h-5' fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                       Cancel
                     </button>
                   )}
                   {item.cancelled && !item.isCompleted && (
-                    <button className='sm:min-w-48 py-2 border border-red-500 rounded text-red-500'>Appointment cancelled</button>
+                    <button className='sm:min-w-48 py-2 border flex-shrink-0 border-red-500 rounded text-red-500'>Appointment cancelled</button>
                   )}
                   {(item.isCompleted || (!item.cancelled && !isFutureAppointment(item.slotDate))) && (
-                    <button className='sm:min-w-48 py-2 border border-green-500 rounded text-green-500'>Completed</button>
+                    <button className='sm:min-w-48 py-2 border flex-shrink-0 border-green-500 rounded text-green-500'>Completed</button>
                   )}
                   {/* ✅ Rate Doctor button */}
                   {isCompleted(item) && !item.cancelled && !reviewedIds[item._id] && (
                     <button
                       onClick={() => { setReviewModal({ appointmentId: item._id, doctorName: item.docData.name }); setSelectedRating(0) }}
-                      className='sm:min-w-48 py-2 bg-yellow-400 hover:bg-yellow-500 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2'
+                      className='sm:min-w-48 py-2 flex-shrink-0 bg-yellow-400 hover:bg-yellow-500 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2'
                     >
                       ⭐ Rate Doctor
                     </button>

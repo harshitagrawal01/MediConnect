@@ -28,6 +28,11 @@ const registerUser = async (req, res) => {
       return res.json({ success: false, message: "enter a strong password" })
     }
 
+    const existingUser = await userModel.findOne({ email })
+    if (existingUser) {
+      return res.json({ success: false, message: "Email already registered" })
+    }
+
     // hashed password
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(password, salt)

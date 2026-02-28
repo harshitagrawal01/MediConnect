@@ -10,7 +10,7 @@ const sendVerificationEmail = async (user) => {
   );
 
   // build the verification link
-  const verifyURL = `${process.env.FRONTEND_URL}/verify-email/${token}`;
+  const verifyURL = `${process.env.BACKEND_URL}/api/user/verify-email/${token}`;
 
   // setup nodemailer 
   const transporter = nodemailer.createTransport({

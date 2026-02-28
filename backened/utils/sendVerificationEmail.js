@@ -40,4 +40,4 @@ const sendVerificationEmail = async (user) => {
   });
 }
 
-module.exports = sendVerificationEmail
+export default sendVerificationEmail

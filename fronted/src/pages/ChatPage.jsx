@@ -218,6 +218,9 @@ const ChatPage = () => {
 
   // Join room & receive messages
   useEffect(() => {
+    if (!socket.connected) {
+      socket.connect()
+    }
     //  Wait for connection then join with role info
     const emitJoin = () => {
       socket.emit("join_room", { room: appointmentId, role: "patient" });
@@ -262,6 +265,7 @@ const ChatPage = () => {
       socket.off("receive_message", handleReceive);
       socket.off("typing", handleTyping);
       socket.off("stop_typing", handleStopTyping);
+      socket.disconnect()
     };
   }, [appointmentId]);
 

@@ -13,6 +13,8 @@ import Footer from './components/Footer'
 import { ToastContainer, toast } from 'react-toastify';
 import ChatPage from './pages/ChatPage'
 import VideoCall from './pages/VideoCall'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 
 const App = () => {
   return (
@@ -31,6 +33,8 @@ const App = () => {
         <Route path='/appointment/:docId' element={<Appointment />} />
         <Route path='/chat/:appointmentId' element={<ChatPage />} />
         <Route path='/video/:appointmentId' element={<VideoCall />} />
+        <Route path='/forgot-password' element={<ForgotPassword />} />
+        <Route path='/reset-password/:token' element={<ResetPassword />} />
       </Routes>
       <Footer />
     </div>

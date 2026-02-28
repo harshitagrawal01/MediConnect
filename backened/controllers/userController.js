@@ -88,6 +88,83 @@ const loginUser = async (req, res) => {
   }
 }
 
+// API to send forgot password email
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body
+
+    const user = await userModel.findOne({ email })
+    if (!user) {
+      return res.json({ success: false, message: "Email not registered" })
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' })
+
+    const resetURL = `${process.env.FRONTEND_URL}/reset-password/${token}`
+
+    // send reset email
+    await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': process.env.BREVO_API_KEY,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { name: 'MediConnect', email: 'darkknight38362@gmail.com' },
+        to: [{ email: user.email, name: user.name }],
+        subject: 'Reset your MediConnect password',
+        htmlContent: `
+          <h2>Password Reset Request</h2>
+          <p>Hi ${user.name}, click the button below to reset your password:</p>
+          <a href="${resetURL}" style="background:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">
+            Reset Password
+          </a>
+          <p>This link will expire in 1 hour.</p>
+          <p>If you didn't request this, ignore this email.</p>
+        `
+      })
+    })
+
+    res.json({ success: true, message: "Reset link sent to your email!" })
+
+  } catch (error) {
+    console.log(error)
+    res.json({ success: false, message: error.message })
+  }
+}
+
+// API to reset password
+const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params
+    const { password } = req.body
+
+    if (password.length < 8) {
+      return res.json({ success: false, message: "Password must be at least 8 characters" })
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const user = await userModel.findById(decoded.id)
+
+    if (!user) {
+      return res.json({ success: false, message: "Invalid or expired link" })
+    }
+
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(password, salt)
+
+    user.password = hashedPassword
+    await user.save()
+
+    res.json({ success: true, message: "Password reset successful! Please login." })
+
+  } catch (error) {
+    console.log(error)
+    res.json({ success: false, message: error.message })
+  }
+}
+
 // API to get user profile data
 const getProfile = async (req, res) => {
   try {
@@ -325,4 +402,4 @@ const verifyEmail = async(req,res) =>{
   }
 }
 
-export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment, paymentRazorpay, verifyRazorpay, verifyEmail }
+export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment, paymentRazorpay, verifyRazorpay, verifyEmail, forgotPassword, resetPassword }

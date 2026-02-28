@@ -193,14 +193,22 @@ const updateProfile = async (req, res) => {
       name,
       phone,
       address: address ? JSON.parse(address) : { line1: '', line2: '' },
-      dob, 
-      gender 
+      dob,
+      gender
     })
     const imageFile = req.file
     if (imageFile) {
 
       //upload image to cloudinary
-      const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: 'image' })
+      const imageUpload = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { resource_type: 'image' },
+          (error, result) => {
+            if (error) reject(error)
+            else resolve(result)
+          }
+        ).end(imageFile.buffer)
+      })
       const imageURL = imageUpload.secure_url
 
       await userModel.findByIdAndUpdate(userId, { image: imageURL })
@@ -381,17 +389,17 @@ const verifyRazorpay = async (req, res) => {
 }
 
 // API to verify email
-const verifyEmail = async(req,res) =>{
+const verifyEmail = async (req, res) => {
   try {
-    
+
     const decoded = jwt.verify(req.params.token, process.env.JWT_SECRET)
     const user = await userModel.findById(decoded.id)
 
-    if(!user){
+    if (!user) {
       return res.redirect(`${process.env.FRONTEND_URL}/verify-failed`)
     }
 
-    if(user.isVerified){
+    if (user.isVerified) {
       return res.redirect(`${process.env.FRONTEND_URL}/login?message=already-verified`)
     }
 
@@ -401,7 +409,7 @@ const verifyEmail = async(req,res) =>{
     res.redirect(`${process.env.FRONTEND_URL}/login?message=verified-successfully`)
 
   } catch (error) {
-    
+
     console.log(error)
     res.redirect(`${process.env.FRONTEND_URL}/verify-failed`)
 

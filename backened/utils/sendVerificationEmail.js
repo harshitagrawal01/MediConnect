@@ -18,7 +18,7 @@ const sendVerificationEmail = async (user) => {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        sender: { name: 'MediConnect', email: 'a3930b001@smtp-brevo.com' },
+        sender: { name: 'MediConnect', email: 'darkknight38362@gmail.com' },
         to: [{ email: user.email, name: user.name }],
         subject: 'Verify your MediConnect account',
         htmlContent: `

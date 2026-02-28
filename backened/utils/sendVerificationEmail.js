@@ -25,7 +25,7 @@ const sendVerificationEmail = async (user) => {
 
   // send the email
   await transporter.sendMail({
-    from: `"MediConnect" <noreply@gmail.com>`,
+    from: `"MediConnect" <a3930b001@smtp-brevo.com>`,
     to: user.email,
     subject: 'Verify your MediConnect account',
     html: `

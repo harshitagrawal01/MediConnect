@@ -15,12 +15,14 @@ import ChatPage from './pages/ChatPage'
 import VideoCall from './pages/VideoCall'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import ScrollToTop from './components/ScrollToTop'
 
 const App = () => {
   return (
     <div className='mx-4 sm:mx-[10%]'>
       <ToastContainer />
       <Navbar />
+      <ScrollToTop />
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/doctors' element={<Doctors />} />

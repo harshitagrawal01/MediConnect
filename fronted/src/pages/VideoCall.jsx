@@ -36,7 +36,7 @@ const VideoCall = () => {
       const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' })
       clientRef.current = client
 
-      //  Register listeners BEFORE joining
+      // ✅ Register listeners BEFORE joining
       client.on('user-published', async (user, mediaType) => {
         await client.subscribe(user, mediaType)
 
@@ -57,10 +57,10 @@ const VideoCall = () => {
         }
       })
 
-      //  Join channel
+      // ✅ Join channel
       await client.join(appId, channelName, agoraToken, uid)
 
-      //  Handle users who were ALREADY in the channel before patient joined
+      // ✅ Handle users who were ALREADY in the channel before patient joined
       for (const user of client.remoteUsers) {
         if (user.hasVideo) {
           await client.subscribe(user, 'video')
@@ -92,7 +92,7 @@ const VideoCall = () => {
     }
   }
 
-  
+  // ✅ Play local video AFTER isJoined renders the local-video div
   useEffect(() => {
     if (isJoined && localTracksRef.current.videoTrack) {
       const raf = requestAnimationFrame(() => {
@@ -334,17 +334,19 @@ const VideoCall = () => {
             height: '65vh',
             marginBottom: '20px'
           }}>
-            {/* Remote video — always in DOM */}
+            {/* Remote video — ALWAYS in DOM and ALWAYS visible, never toggled */}
             <div
               id='remote-video'
-              style={{ width: '100%', height: '100%', display: remoteUser ? 'block' : 'none' }}
+              style={{ width: '100%', height: '100%' }}
             />
 
+            {/* Waiting overlay — sits on top until remote user appears */}
             {!remoteUser && (
               <div style={{
-                width: '100%', height: '100%',
+                position: 'absolute', inset: 0,
                 display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center', gap: '16px'
+                alignItems: 'center', justifyContent: 'center', gap: '16px',
+                background: 'rgba(10,15,30,0.95)'
               }}>
                 <div style={{
                   width: '80px', height: '80px',

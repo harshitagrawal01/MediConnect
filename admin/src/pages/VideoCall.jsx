@@ -36,7 +36,7 @@ const VideoCall = () => {
       const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' })
       clientRef.current = client
 
-      // ✅ Register listeners BEFORE joining
+      //  Register listeners BEFORE joining
       client.on('user-published', async (user, mediaType) => {
         await client.subscribe(user, mediaType)
 
@@ -57,10 +57,10 @@ const VideoCall = () => {
         }
       })
 
-      // ✅ Join channel
+      //  Join channel
       await client.join(appId, channelName, agoraToken, uid)
 
-      // ✅ Handle users who were ALREADY in the channel before doctor joined
+      //  Handle users who were ALREADY in the channel before doctor joined
       for (const user of client.remoteUsers) {
         if (user.hasVideo) {
           await client.subscribe(user, 'video')
@@ -92,7 +92,7 @@ const VideoCall = () => {
     }
   }
 
-  // ✅ Play local video AFTER isJoined renders the local-video div
+  //  Play local video AFTER isJoined renders the local-video div
   useEffect(() => {
     if (isJoined && localTracksRef.current.videoTrack) {
       const raf = requestAnimationFrame(() => {
@@ -102,7 +102,7 @@ const VideoCall = () => {
     }
   }, [isJoined])
 
-  // ✅ Play remote video AFTER remoteUser state change renders the div
+  //  Play remote video AFTER remoteUser state change renders the div
   useEffect(() => {
     if (remoteUser && pendingRemoteVideoTrack.current) {
       const raf = requestAnimationFrame(() => {
@@ -151,14 +151,14 @@ const VideoCall = () => {
     return `${m}:${s}`
   }
 
-  // ✅ Use dToken as dependency — more reliable than profileData
+  //  Use dToken as dependency — more reliable than profileData
   useEffect(() => {
     const fetchToken = async () => {
       try {
         const { data } = await axios.post(
           backendUrl + '/api/video/get-token',
           { appointmentId, uid: 1 },
-          { headers: { token: dToken } } // ✅ key must be 'token'
+          { headers: { token: dToken } } //  key must be 'token'
         )
         if (data.success) setAgoraToken(data.token)
         else toast.error(data.message)
@@ -167,7 +167,7 @@ const VideoCall = () => {
         toast.error(error.message)
       }
     }
-    if (dToken) fetchToken() // ✅ trigger on dToken, not profileData
+    if (dToken) fetchToken() // trigger on dToken, not profileData
   }, [dToken])
 
   useEffect(() => {

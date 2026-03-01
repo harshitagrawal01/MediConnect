@@ -20,8 +20,6 @@ const VideoCall = () => {
   const clientRef = useRef(null)
   const localTracksRef = useRef({ audioTrack: null, videoTrack: null })
   const timerRef = useRef(null)
-
-  // ✅ FIX: Store pending remote video track so we can play it after DOM renders
   const pendingRemoteVideoTrack = useRef(null)
 
   const joinCall = async () => {
@@ -33,19 +31,18 @@ const VideoCall = () => {
 
       const appId = import.meta.env.VITE_AGORA_APP_ID
       const channelName = appointmentId
-      const uid = 0
+      const uid = 0 // Patient is always uid: 0
 
       const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' })
       clientRef.current = client
 
+      //  Register listeners BEFORE joining
       client.on('user-published', async (user, mediaType) => {
-        // ✅ Subscribe immediately — don't delay this
         await client.subscribe(user, mediaType)
 
         if (mediaType === 'video') {
-          // ✅ Store the track ref FIRST, then trigger state update
           pendingRemoteVideoTrack.current = user.videoTrack
-          setRemoteUser(user) // This triggers re-render → useEffect will play the track
+          setRemoteUser(user)
         }
 
         if (mediaType === 'audio') {
@@ -60,7 +57,21 @@ const VideoCall = () => {
         }
       })
 
+      //  Join channel
       await client.join(appId, channelName, agoraToken, uid)
+
+      //  Handle users who were ALREADY in the channel before patient joined
+      for (const user of client.remoteUsers) {
+        if (user.hasVideo) {
+          await client.subscribe(user, 'video')
+          pendingRemoteVideoTrack.current = user.videoTrack
+          setRemoteUser(user)
+        }
+        if (user.hasAudio) {
+          await client.subscribe(user, 'audio')
+          user.audioTrack.play()
+        }
+      }
 
       const [audioTrack, videoTrack] = await AgoraRTC.createMicrophoneAndCameraTracks(
         {},
@@ -69,7 +80,6 @@ const VideoCall = () => {
       localTracksRef.current = { audioTrack, videoTrack }
       await client.publish([audioTrack, videoTrack])
 
-      // ✅ Set joined first so the local-video div renders, then play
       setIsJoined(true)
 
       timerRef.current = setInterval(() => {
@@ -82,7 +92,7 @@ const VideoCall = () => {
     }
   }
 
-  // ✅ FIX: Play local video AFTER isJoined renders the local-video div
+  
   useEffect(() => {
     if (isJoined && localTracksRef.current.videoTrack) {
       const raf = requestAnimationFrame(() => {
@@ -92,7 +102,7 @@ const VideoCall = () => {
     }
   }, [isJoined])
 
-  // ✅ FIX: Play remote video AFTER remoteUser state change causes DOM to render the div
+  // ✅ Play remote video AFTER remoteUser state change renders the div
   useEffect(() => {
     if (remoteUser && pendingRemoteVideoTrack.current) {
       const raf = requestAnimationFrame(() => {
@@ -180,7 +190,6 @@ const VideoCall = () => {
       overflow: 'hidden'
     }}>
 
-      {/* Background grid effect */}
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: 'linear-gradient(rgba(20,184,166,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(20,184,166,0.03) 1px, transparent 1px)',
@@ -188,7 +197,6 @@ const VideoCall = () => {
         pointerEvents: 'none'
       }} />
 
-      {/* Glowing orbs */}
       <div style={{
         position: 'absolute', top: '10%', left: '5%',
         width: '300px', height: '300px',
@@ -295,7 +303,6 @@ const VideoCall = () => {
       ) : (
         <div style={{ width: '100%', maxWidth: '1000px', zIndex: 1 }}>
 
-          {/* Top bar */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             marginBottom: '16px', padding: '0 4px'
@@ -318,7 +325,6 @@ const VideoCall = () => {
             </div>
           </div>
 
-          {/* Video area */}
           <div style={{
             position: 'relative',
             background: 'rgba(255,255,255,0.03)',
@@ -328,13 +334,12 @@ const VideoCall = () => {
             height: '65vh',
             marginBottom: '20px'
           }}>
-            {/* Remote video — always rendered so DOM element is always available */}
+            {/* Remote video — always in DOM */}
             <div
               id='remote-video'
               style={{ width: '100%', height: '100%', display: remoteUser ? 'block' : 'none' }}
             />
 
-            {/* Waiting state — shown when no remote user */}
             {!remoteUser && (
               <div style={{
                 width: '100%', height: '100%',
@@ -393,7 +398,6 @@ const VideoCall = () => {
             </div>
           </div>
 
-          {/* Controls */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
             <button onClick={toggleMute} style={{
               width: '56px', height: '56px', borderRadius: '50%', border: 'none',

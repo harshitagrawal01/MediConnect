@@ -20,8 +20,6 @@ const VideoCall = () => {
   const clientRef = useRef(null)
   const localTracksRef = useRef({ audioTrack: null, videoTrack: null })
   const timerRef = useRef(null)
-
-  
   const pendingRemoteVideoTrack = useRef(null)
 
   const joinCall = async () => {
@@ -33,19 +31,18 @@ const VideoCall = () => {
 
       const appId = import.meta.env.VITE_AGORA_APP_ID
       const channelName = appointmentId
-      const uid = 1  // Doctor is always uid: 1
+      const uid = 1 // Doctor is always uid: 1
 
       const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' })
       clientRef.current = client
 
+      // ✅ Register listeners BEFORE joining
       client.on('user-published', async (user, mediaType) => {
-        
         await client.subscribe(user, mediaType)
 
         if (mediaType === 'video') {
-         
           pendingRemoteVideoTrack.current = user.videoTrack
-          setRemoteUser(user) // triggers re-render → useEffect plays the track
+          setRemoteUser(user)
         }
 
         if (mediaType === 'audio') {
@@ -60,7 +57,21 @@ const VideoCall = () => {
         }
       })
 
+      // ✅ Join channel
       await client.join(appId, channelName, agoraToken, uid)
+
+      // ✅ Handle users who were ALREADY in the channel before doctor joined
+      for (const user of client.remoteUsers) {
+        if (user.hasVideo) {
+          await client.subscribe(user, 'video')
+          pendingRemoteVideoTrack.current = user.videoTrack
+          setRemoteUser(user)
+        }
+        if (user.hasAudio) {
+          await client.subscribe(user, 'audio')
+          user.audioTrack.play()
+        }
+      }
 
       const [audioTrack, videoTrack] = await AgoraRTC.createMicrophoneAndCameraTracks(
         {},
@@ -69,7 +80,6 @@ const VideoCall = () => {
       localTracksRef.current = { audioTrack, videoTrack }
       await client.publish([audioTrack, videoTrack])
 
-     
       setIsJoined(true)
 
       timerRef.current = setInterval(() => {
@@ -82,7 +92,7 @@ const VideoCall = () => {
     }
   }
 
-  
+  // ✅ Play local video AFTER isJoined renders the local-video div
   useEffect(() => {
     if (isJoined && localTracksRef.current.videoTrack) {
       const raf = requestAnimationFrame(() => {
@@ -92,6 +102,7 @@ const VideoCall = () => {
     }
   }, [isJoined])
 
+  // ✅ Play remote video AFTER remoteUser state change renders the div
   useEffect(() => {
     if (remoteUser && pendingRemoteVideoTrack.current) {
       const raf = requestAnimationFrame(() => {
@@ -140,13 +151,14 @@ const VideoCall = () => {
     return `${m}:${s}`
   }
 
+  // ✅ Use dToken as dependency — more reliable than profileData
   useEffect(() => {
     const fetchToken = async () => {
       try {
         const { data } = await axios.post(
           backendUrl + '/api/video/get-token',
           { appointmentId, uid: 1 },
-          { headers: { token: dToken } }
+          { headers: { token: dToken } } // ✅ key must be 'token'
         )
         if (data.success) setAgoraToken(data.token)
         else toast.error(data.message)
@@ -155,7 +167,7 @@ const VideoCall = () => {
         toast.error(error.message)
       }
     }
-    if (profileData) fetchToken()
+    if (dToken) fetchToken() // ✅ trigger on dToken, not profileData
   }, [dToken])
 
   useEffect(() => {
@@ -179,7 +191,6 @@ const VideoCall = () => {
       overflow: 'hidden'
     }}>
 
-      {/* Background grid effect */}
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: 'linear-gradient(rgba(20,184,166,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(20,184,166,0.03) 1px, transparent 1px)',
@@ -187,7 +198,6 @@ const VideoCall = () => {
         pointerEvents: 'none'
       }} />
 
-      {/* Glowing orbs */}
       <div style={{
         position: 'absolute', top: '10%', left: '5%',
         width: '300px', height: '300px',
@@ -202,9 +212,7 @@ const VideoCall = () => {
       }} />
 
       {!isJoined ? (
-        /* ── WAITING ROOM ── */
         <div style={{ textAlign: 'center', zIndex: 1, maxWidth: '420px', width: '100%' }}>
-
           <div style={{
             width: '90px', height: '90px',
             background: 'linear-gradient(135deg, #14b8a6, #0ea5e9)',
@@ -294,10 +302,8 @@ const VideoCall = () => {
         </div>
 
       ) : (
-        /* ── ACTIVE CALL ── */
         <div style={{ width: '100%', maxWidth: '1000px', zIndex: 1 }}>
 
-          {/* Top bar */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             marginBottom: '16px', padding: '0 4px'
@@ -320,7 +326,6 @@ const VideoCall = () => {
             </div>
           </div>
 
-          {/* Video area */}
           <div style={{
             position: 'relative',
             background: 'rgba(255,255,255,0.03)',
@@ -330,13 +335,12 @@ const VideoCall = () => {
             height: '65vh',
             marginBottom: '20px'
           }}>
-            {/* Remote video — always in DOM so element is always available */}
+            {/* Remote video — always in DOM */}
             <div
               id='remote-video'
               style={{ width: '100%', height: '100%', display: remoteUser ? 'block' : 'none' }}
             />
 
-            {/* Waiting state */}
             {!remoteUser && (
               <div style={{
                 width: '100%', height: '100%',
@@ -395,10 +399,7 @@ const VideoCall = () => {
             </div>
           </div>
 
-          {/* Controls */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
-
-            {/* Mute */}
             <button onClick={toggleMute} style={{
               width: '56px', height: '56px', borderRadius: '50%', border: 'none',
               background: isMuted ? '#ef4444' : 'rgba(255,255,255,0.08)',
@@ -418,7 +419,6 @@ const VideoCall = () => {
               )}
             </button>
 
-            {/* End call */}
             <button onClick={leaveCall} style={{
               width: '68px', height: '68px', borderRadius: '50%', border: 'none',
               background: 'linear-gradient(135deg, #ef4444, #dc2626)',
@@ -432,7 +432,6 @@ const VideoCall = () => {
               </svg>
             </button>
 
-            {/* Camera */}
             <button onClick={toggleCamera} style={{
               width: '56px', height: '56px', borderRadius: '50%', border: 'none',
               background: isCameraOff ? '#ef4444' : 'rgba(255,255,255,0.08)',

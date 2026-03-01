@@ -146,7 +146,7 @@ const VideoCall = () => {
         const { data } = await axios.post(
           backendUrl + '/api/video/get-token',
           { appointmentId, uid: 1 },
-          { headers: { dToken } }
+          { headers: { token: dToken } }
         )
         if (data.success) setAgoraToken(data.token)
         else toast.error(data.message)
@@ -156,7 +156,7 @@ const VideoCall = () => {
       }
     }
     if (profileData) fetchToken()
-  }, [profileData])
+  }, [dToken])
 
   useEffect(() => {
     return () => {

@@ -199,8 +199,8 @@ const VideoCall = () => {
         borderRadius: '50%', pointerEvents: 'none'
       }} />
 
-      {!isJoined ? (
-        <div style={{ textAlign: 'center', zIndex: 1, maxWidth: '420px', width: '100%' }}>
+      {/* ✅ Waiting room — hidden via CSS after join, NOT unmounted */}
+      <div style={{ display: isJoined ? 'none' : 'block', textAlign: 'center', zIndex: 1, maxWidth: '420px', width: '100%' }}>
           <div style={{
             width: '90px', height: '90px',
             background: 'linear-gradient(135deg, #14b8a6, #0ea5e9)', borderRadius: '28px',
@@ -256,8 +256,8 @@ const VideoCall = () => {
           `}</style>
         </div>
 
-      ) : (
-        <div style={{ width: '100%', maxWidth: '1000px', zIndex: 1 }}>
+      {/* ✅ Video area — hidden via CSS before join, NOT conditionally mounted */}
+      <div style={{ display: isJoined ? 'block' : 'none', width: '100%', maxWidth: '1000px', zIndex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', padding: '0 4px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{ width: '8px', height: '8px', background: '#22c55e', borderRadius: '50%', boxShadow: '0 0 8px #22c55e' }} />
@@ -363,7 +363,6 @@ const VideoCall = () => {
 
           <style>{`@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }`}</style>
         </div>
-      )}
     </div>
   )
 }

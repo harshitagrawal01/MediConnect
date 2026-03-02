@@ -252,7 +252,7 @@ const MyAppointments = () => {
                   {(item.isCompleted || (!item.cancelled && !isFutureAppointment(item.slotDate))) && (
                     <button className='sm:min-w-48 py-2 border flex-shrink-0 border-green-500 rounded text-green-500'>Completed</button>
                   )}
-                  {/* ✅ Rate Doctor button */}
+                  {/*  Rate Doctor button */}
                   {isCompleted(item) && !item.cancelled && !reviewedIds[item._id] && (
                     <button
                       onClick={() => { setReviewModal({ appointmentId: item._id, doctorName: item.docData.name }); setSelectedRating(0) }}

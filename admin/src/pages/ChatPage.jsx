@@ -434,7 +434,7 @@ const ChatPage = () => {
                 onChange={handleFileSelect}
               />
               <div style={S.inputPill}>
-                {/* Attach button — was missing in doctor's original file */}
+                {/* Attach button  */}
                 <button
                   className="dchat-attach"
                   style={S.attachBtn}

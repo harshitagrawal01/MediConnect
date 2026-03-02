@@ -24,7 +24,7 @@ const Navbar = () => {
     <div className='flex justify-between items-center px-4 sm:px-10 py-3 border-b bg-white'>
       <div className='flex items-center gap-2 text-xs'>
 
-        {/* Replaced assets.admin_logo with MediConnect branded text logo */}
+        
         <div className='flex flex-col leading-tight cursor-pointer' onClick={() => aToken ? navigate('/admin-dashboard') : navigate('/doctor-dashboard')}>
           <span className='text-xl font-bold text-primary tracking-tight'>MediConnect</span>
           <span className='text-gray-400 text-[11px] font-medium tracking-wide'>Dashboard Panel</span>

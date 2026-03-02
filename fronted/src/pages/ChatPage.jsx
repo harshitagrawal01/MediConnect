@@ -413,7 +413,7 @@ const ChatPage = () => {
                     <div style={S.msgInit(isMe)}>{isMe ? "P" : "Dr"}</div>
                     <div style={S.bubbleWrap(isMe)}>
 
-                      {/* ✅ File message */}
+                      {/*  File message */}
                       {m.messageType === "file" && m.fileUrl
                         ? <FileBubble m={m} isMe={isMe} />
                         : <div style={S.bubble(isMe)}>{m.message}</div>

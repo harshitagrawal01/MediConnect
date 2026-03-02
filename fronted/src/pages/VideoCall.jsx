@@ -21,7 +21,7 @@ const VideoCall = () => {
   const localTracksRef = useRef({ audioTrack: null, videoTrack: null })
   const timerRef = useRef(null)
 
-  // ✅ DOM refs instead of string IDs
+  //  DOM refs 
   const localVideoRef = useRef(null)
   const remoteVideoRef = useRef(null)
   const remoteVideoTrackRef = useRef(null)
@@ -40,13 +40,13 @@ const VideoCall = () => {
       const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' })
       clientRef.current = client
 
-      // ✅ Listeners BEFORE join
+      //  Listeners BEFORE join
       client.on('user-published', async (user, mediaType) => {
         await client.subscribe(user, mediaType)
         if (mediaType === 'video') {
           remoteVideoTrackRef.current = user.videoTrack
           setRemoteUser(user)
-          // ✅ Play directly into ref element — no ID string, no timing issues
+          // Play directly into ref element 
           if (remoteVideoRef.current) {
             user.videoTrack.play(remoteVideoRef.current)
           }
@@ -65,7 +65,7 @@ const VideoCall = () => {
 
       await client.join(appId, channelName, agoraToken, uid)
 
-      // ✅ Handle already-present users (doctor joined before patient)
+      // Handle already-present users (doctor joined before patient)
       for (const user of client.remoteUsers) {
         if (user.hasVideo) {
           await client.subscribe(user, 'video')
@@ -100,14 +100,14 @@ const VideoCall = () => {
     }
   }
 
-  // ✅ Play local video via ref after isJoined renders the div
+  // Play local video via ref after isJoined renders the div
   useEffect(() => {
     if (isJoined && localVideoRef.current && localTracksRef.current.videoTrack) {
       localTracksRef.current.videoTrack.play(localVideoRef.current)
     }
   }, [isJoined])
 
-  // ✅ Fallback: play remote video via ref if track arrived before ref was ready
+  //  Fallback: play remote video via ref if track arrived before ref was ready
   useEffect(() => {
     if (remoteUser && remoteVideoRef.current && remoteVideoTrackRef.current) {
       remoteVideoTrackRef.current.play(remoteVideoRef.current)
@@ -198,7 +198,7 @@ const VideoCall = () => {
         borderRadius: '50%', pointerEvents: 'none'
       }} />
 
-      {/* ✅ Waiting room — hidden via CSS after join, NOT unmounted */}
+      {/*  Waiting room */}
       <div style={{ display: isJoined ? 'none' : 'block', textAlign: 'center', zIndex: 1, maxWidth: '420px', width: '100%' }}>
           <div style={{
             width: '90px', height: '90px',
@@ -255,7 +255,7 @@ const VideoCall = () => {
           `}</style>
         </div>
 
-      {/* ✅ Video area — hidden via CSS before join, NOT conditionally mounted */}
+      {/*  Video area  */}
       <div style={{ display: isJoined ? 'block' : 'none', width: '100%', maxWidth: '1000px', zIndex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', padding: '0 4px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -276,7 +276,7 @@ const VideoCall = () => {
             border: '1px solid rgba(255,255,255,0.08)', borderRadius: '24px',
             overflow: 'hidden', height: '65vh', marginBottom: '20px'
           }}>
-            {/* ✅ Remote video — ref, always full size, always in DOM */}
+            {/*  Remote video */}
             <div ref={remoteVideoRef} style={{ width: '100%', height: '100%' }} />
 
             {/* Waiting overlay on top */}
@@ -299,7 +299,7 @@ const VideoCall = () => {
               </div>
             )}
 
-            {/* ✅ Local video — ref */}
+            {/*  Local video  */}
             <div style={{
               position: 'absolute', bottom: '16px', right: '16px',
               width: '160px', height: '120px', background: '#0f172a', borderRadius: '14px',

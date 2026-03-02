@@ -15,7 +15,7 @@ const SpecialityMenu = () => {
             key={index}
             to={`/doctors/${item.speciality}`}
           >
-            {/* Teal circle background — icon sits on top with no filter, so it stays crisp */}
+            {/* Teal circle background  */}
             <div className='w-16 sm:w-24 h-16 sm:h-24 rounded-full bg-teal-500 flex items-center justify-center mb-2 shadow-md hover:bg-teal-600 transition-colors duration-300'>
               <img
                 className='w-10 sm:w-14'

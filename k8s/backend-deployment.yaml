@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: mediconnect
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: 347351796859.dkr.ecr.us-east-1.amazonaws.com/mediconnect-backend:latest
+          ports:
+            - containerPort: 4000
+          envFrom:
+            - secretRef:
+                name: mediconnect-backend-secret

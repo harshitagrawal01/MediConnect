@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: admin
-          image: 347351796859.dkr.ecr.us-east-1.amazonaws.com/mediconnect-admin:latest
+          image: 389083920935.dkr.ecr.us-east-1.amazonaws.com/mediconnect-admin:latest
           ports:
             - containerPort: 80
           readinessProbe:

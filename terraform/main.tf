@@ -112,12 +112,12 @@ resource "aws_eks_node_group" "mediconnect_nodes" {
   ]
 
   scaling_config {
-    desired_size = 4
-    max_size     = 5
+    desired_size = 3
+    max_size     = 4
     min_size     = 1
   }
 
-  instance_types = ["t3.micro"]
+  instance_types = ["t3.small"]
 
   depends_on = [
     aws_iam_role_policy_attachment.eks_worker_node_policy,

@@ -14,6 +14,7 @@ import videoRoutes from "./routes/videoRoutes.js"
 import contactRouter from './routes/contactRoutes.js'
 import reviewRouter from './routes/reviewRoutes.js'
 import https from 'https'
+import mongoose from 'mongoose'
 
 
 if (process.env.NODE_ENV === "production") {
@@ -133,14 +134,14 @@ app.use('/api/review', reviewRouter)
 
 app.get('/', (req, res) => res.send('API working'))
 
-// Keep server awake on free tier
-setInterval(() => {
-  https.get('https://mediconnect-mvp5.onrender.com/', (res) => {
-    console.log('Server pinged, status:', res.statusCode);
-  }).on('error', (err) => {
-    console.error('Ping error:', err.message);
-  });
-}, 14 * 60 * 1000);
+app.get('/api/health', (req, res) => {
+  const dbState = mongoose.connection.readyState
+  if (dbState === 1) {
+    res.status(200).json({ status: 'ok', db: 'connected' })
+  } else {
+    res.status(503).json({ status: 'unavailable', db: 'disconnected' })
+  }
+})
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 

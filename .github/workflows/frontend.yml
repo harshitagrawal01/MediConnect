@@ -1,0 +1,79 @@
+name: Build and Push Frontend
+
+on:
+  push:
+    branches:
+      - feature/aws-migration
+    paths:
+      - 'fronted/**'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # SonarCloud ke liye history chahiye
+
+      # 1. SONARCLOUD SCAN (Frontend-specific project key)
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=harshitagrawal01_MediConnect-Frontend
+            -Dsonar.organization=harshitagrawal01
+            -Dsonar.sources=fronted/
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # 2. BUILD DOCKER IMAGE (Aapke Vite args ke sath)
+      - name: Build image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: mediconnect-frontend
+          IMAGE_TAG: latest
+        run: |
+          docker build \
+            --build-arg VITE_BACKEND_URL='${{ secrets.VITE_BACKEND_URL }}' \
+            --build-arg VITE_RAZORPAY_KEY_ID='${{ secrets.VITE_RAZORPAY_KEY_ID }}' \
+            --build-arg VITE_AGORA_APP_ID='${{ secrets.VITE_AGORA_APP_ID }}' \
+            --build-arg VITE_SOCKET_URL='${{ secrets.VITE_SOCKET_URL }}' \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./fronted
+
+      # 3. TRIVY SCAN (Push se pehle)
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: mediconnect-frontend
+          IMAGE_TAG: latest
+        with:
+          image-ref: '${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      # 4. PUSH TO ECR
+      - name: Push image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: mediconnect-frontend
+          IMAGE_TAG: latest
+        run: |
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
